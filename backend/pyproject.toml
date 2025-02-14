@@ -10,6 +10,7 @@ python = "^3.11"
 pydantic = "^2.10.6"
 fastapi = {extras = ["standard"], version = "^0.115.8"}
 pydantic-settings = "^2.7.1"
+uvicorn = {extras = ["standard"], version = "^0.34.0"}
 
 
 [build-system]
