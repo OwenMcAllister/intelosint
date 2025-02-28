@@ -8,4 +8,4 @@ class userInput(BaseModel):
     input: str
 
 class classifiedOutput(BaseModel):
-    type: NodeType
+    data_type: NodeType

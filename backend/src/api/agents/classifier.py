@@ -44,7 +44,7 @@ async def classify_data(input: userInput) -> classifiedOutput:
         "You are an OSINT classifier agent. Given an input, classify it appropriatly."
     )
     
-    user_prompt = input
+    user_prompt = input.input
     
     try:
         response = await client.beta.chat.completions.parse(
@@ -57,7 +57,18 @@ async def classify_data(input: userInput) -> classifiedOutput:
             temperature=0,
         )
         
-        return response
+        structured_data = response.choices[0].message.content
+
+        try:
+            data = json.loads(structured_data)
+        except json.JSONDecodeError as e:
+            raise ValueError(f"Failed to decode JSON: {e}")
+
+        if 'data_type' not in data:
+            raise ValueError("The key 'locations' is missing from the response data.")
+
+        return classifiedOutput(data_type=NodeType(data['data_type']))
+
         
     except (ValidationError, Exception) as e:
         raise e
