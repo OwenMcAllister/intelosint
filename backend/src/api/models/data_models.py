@@ -1,11 +1,12 @@
 # built in
-from typing import List
+from typing import List, Optional
 
 # external
 from pydantic import BaseModel
 
 # internal
 from enum import Enum
+from pydantic import BaseModel, HttpUrl, IPvAnyAddress
 
 
 class NodeType(str, Enum):
@@ -119,14 +120,14 @@ class IPAddress(BaseModel):
 class Image(BaseModel):
     id: int
     parent_id: int
-    data: bytearray
+    data: str
     description: str
     type: NodeType = NodeType.IMAGE
 
 class Video(BaseModel):
     id: int
     parent_id: int
-    data: bytearray
+    data: str
     description: str
     type: NodeType = NodeType.VIDEO
 
