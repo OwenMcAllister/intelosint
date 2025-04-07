@@ -1,6 +1,5 @@
 # builtin
 from contextlib import asynccontextmanager
-import os
 
 # external
 from fastapi import FastAPI
