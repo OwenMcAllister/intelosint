@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 
 # internal
 from src.routes import setup_routes
-from src.globals.environment import Environment
+from src.globals import Environment
 
 
 

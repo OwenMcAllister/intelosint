@@ -8,9 +8,16 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.11"
 pydantic = "^2.10.6"
+<<<<<<< HEAD
 fastapi = {extras = ["standard"], version = "^0.115.8"}
 pydantic-settings = "^2.7.1"
 uvicorn = {extras = ["standard"], version = "^0.34.0"}
+=======
+fastapi = "^0.115.8"
+pydantic-settings = "^2.7.1"
+uvicorn = "^0.34.0"
+openai = "^1.65.0"
+>>>>>>> main
 
 
 [build-system]
