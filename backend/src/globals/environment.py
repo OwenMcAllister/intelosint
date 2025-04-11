@@ -9,3 +9,4 @@ class Environment(BaseSettings):
     NEO4J_USER: str
 
     FACECHECK_API_KEY: str
+    SERPAPI_API_KEY: str
