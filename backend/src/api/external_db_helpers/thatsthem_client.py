@@ -3,26 +3,43 @@ import re
 from bs4 import BeautifulSoup
 import json
 import requests
+import httpx
+import asyncio
 
 
-proxies = requests.get("https://api.proxyscrape.com/v2/?request=displayproxies&protocol=http&timeout=10000&country=all&ssl=all&anonymity=all").text
-proxy_list = [proxy.strip() for proxy in proxies.strip().split('\n')]
+async def fetch_proxies():
+    async with httpx.AsyncClient(timeout=15) as client:
+        response = await client.get(
+            "https://api.proxyscrape.com/v2/?request=displayproxies&protocol=http&timeout=10000&country=all&ssl=all&anonymity=all"
+        )
+        proxies = response.text
+        return [proxy.strip() for proxy in proxies.strip().split('\n')]
+
+
+HEADERS = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36",
+}
 
 
 def format_query(query):
     query = query.strip()
-    
     query = re.sub(r'[^a-zA-Z\s]', '', query)
-    
     words = query.split()
-    
-    formatted_query = '-'.join(word.capitalize() for word in words)
-    
-    return formatted_query
+    return '-'.join(word.capitalize() for word in words)
+
+
+async def fetch_with_proxy(url, proxy):
+    proxies = {
+        "http://": f"http://{proxy}",
+        "https://": f"http://{proxy}",
+    }
+    async with httpx.AsyncClient(headers=HEADERS, proxies=proxies, timeout=15) as client:
+        response = await client.get(url)
+        return response.text
+
 
 
 def unescape(text):
-    # Remove junk from string.
     text = text.replace('\\', '').replace('\n', '').replace('\r', '').strip()
     text = text.strip()
     if len(text) == 0:
@@ -305,60 +322,54 @@ def extract_email_records(html_source):
     return {'records': records}
 
 
-def search_by_name(name, location):
-    scraper = cloudscraper.CloudScraper()
-    
+async def search_by_name(name: str, location: str):
+    proxies = await fetch_proxies()
     name = format_query(name)
     location = format_query(location)
-    
     url = f"https://thatsthem.com/name/{name}/{location}"
-    
-    for proxy in proxy_list:
-        response = scraper.get(url, proxies={"http": proxy})
-    
-        if "Found 0 results" in response.text:
-            return {}
-        
-        if "Limit Reached" not in response.text:
-            records = extract_name_records(response.text)
-            return records
-    
+
+    for proxy in proxies:
+        try:
+            html = await fetch_with_proxy(url, proxy)
+            if "Found 0 results" in html:
+                return {}
+            if "Limit Reached" not in html:
+                return extract_name_records(html)
+        except Exception as e:
+            print(f"Proxy failed: {proxy}, error: {e}")
+            continue
     return {}
 
 
-def search_by_phone(phone_number):
-    scraper = cloudscraper.CloudScraper()
-    
+async def search_by_phone(phone_number: str):
+    proxies = await fetch_proxies()
     url = f"https://thatsthem.com/phone/{phone_number}"
 
-    for proxy in proxy_list:
-        response = scraper.get(url, proxies={"http": proxy})
-
-        print(response)
-    
-        if "Found 0 results" in response.text:
-            return {}
-        
-        if "Limit Reached" not in response.text:
-            records = extract_phone_records(response.text)
-            return records
-    
+    for proxy in proxies:
+        try:
+            html = await fetch_with_proxy(url, proxy)
+            if "Found 0 results" in html:
+                return {}
+            if "Limit Reached" not in html:
+                return extract_phone_records(html)
+        except Exception as e:
+            print(f"Proxy failed: {proxy}, error: {e}")
+            continue
     return {}
 
 
-def search_by_email(email_address):
-    scraper = cloudscraper.CloudScraper()
-    
+async def search_by_email(email_address: str):
+    proxies = await fetch_proxies()
     url = f"https://thatsthem.com/email/{email_address}"
-    
-    for proxy in proxy_list:
-        response = scraper.get(url, proxies={"http": proxy})
-    
-        if "Found 0 results" in response.text:
-            return {}
-        
-        if "Limit Reached" not in response.text:
-            records = extract_email_records(response.text)
-            return records
-    
+
+    for proxy in proxies:
+        try:
+            html = await fetch_with_proxy(url, proxy)
+            if "Found 0 results" in html:
+                return {}
+            if "Limit Reached" not in html:
+                return extract_email_records(html)
+        except Exception as e:
+            print(f"Proxy failed: {proxy}, error: {e}")
+            continue
     return {}
