@@ -72,3 +72,139 @@ async def classify_data(input: userInput) -> classifiedOutput:
         
     except (ValidationError, Exception) as e:
         raise e
+
+
+async def fit_data_to_object(data: str, data_type: NodeType, parent_id: int):
+
+    data_object = create_data_object(data_type)
+
+    
+
+
+
+async def create_data_object(NodeType):
+
+    switch = {
+    NodeType.PHONE_NUMBER: PhoneNumber(
+        id=0,
+        parent_id=parent_id,
+        number=data,
+        description="",
+    ),
+    NodeType.EMAIL_ADDRESS: EmailAddress(
+        id=0,
+        parent_id=parent_id,
+        email=data,
+        description="",
+    ),
+    NodeType.USER_NAME: UserName(
+        id=0,
+        parent_id=parent_id,
+        username=data,
+        description="",
+    ),
+    NodeType.SOCIAL_MEDIA_ACCOUNT: SocialMediaAccount(
+        id=0,
+        parent_id=parent_id,
+        handle=data,  # Platform can be parsed if needed
+        description="",
+    ),
+    NodeType.ACCOUNT_GENERIC: GenericAccount(
+        id=0,
+        parent_id=parent_id,
+        account=data,
+        description="",
+    ),
+    NodeType.PHYSICAL_ADRESS: PhysicalAddress(
+        id=0,
+        parent_id=parent_id,
+        address=data,
+        description="",
+    ),
+    NodeType.COORDINATES: Coordinates(
+        id=0,
+        parent_id=parent_id,
+        latitude=0.0,
+        longitude=0.0,
+        description="",
+    ),
+    NodeType.PERSON: Person(
+        id=0,
+        parent_id=parent_id,
+        name=data,
+        description="",
+    ),
+    NodeType.BUSINESS: Business(
+        id=0,
+        parent_id=parent_id,
+        name=data,
+        description="",
+    ),
+    NodeType.DOMAIN_NAME: DomainName(
+        id=0,
+        parent_id=parent_id,
+        domain=data,
+        description="",
+    ),
+    NodeType.WEB_ADDRESS: WebAddress(
+        id=0,
+        parent_id=parent_id,
+        url=data,  # Should be a valid HttpUrl
+        description="",
+    ),
+    NodeType.IP_ADDRESS: IPAddress(
+        id=0,
+        parent_id=parent_id,
+        ip=data,  # Should be a valid IPvAnyAddress
+        description="",
+    ),
+    NodeType.IMAGE: Image(
+        id=0,
+        parent_id=parent_id,
+        data=data,  # Could store a base64 or URL reference
+        description="",
+    ),
+    NodeType.VIDEO: Video(
+        id=0,
+        parent_id=parent_id,
+        data=data,  # Could store a base64 or URL reference
+        description="",
+    ),
+    NodeType.CYPRO_WALLET: CryptoWallet(
+        id=0,
+        parent_id=parent_id,
+        wallet_address=data,
+        description="",
+    ),
+    NodeType.CYPRO_TRANSACTION: CryptoTransaction(
+        id=0,
+        parent_id=parent_id,
+        transaction_id=data,
+        description="",
+    ),
+    NodeType.DATA_BREACH: DataBreach(
+        id=0,
+        parent_id=parent_id,
+        breach_name=data,
+        description="",
+    ),
+    NodeType.PASSWORD: Password(
+        id=0,
+        parent_id=parent_id,
+        password=data,
+        description="",
+    ),
+    NodeType.MISC: Miscellaneous(
+        id=0,
+        parent_id=parent_id,
+        content=data,
+        description="",
+    ),
+    }
+
+    return switch.get(data_type, Miscellaneous(
+        id=0,
+        parent_id=parent_id,
+        content=data,
+        description="Unrecognized type defaulted to Miscellaneous."
+    ))
