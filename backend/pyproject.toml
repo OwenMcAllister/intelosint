@@ -16,6 +16,7 @@ neo4j = "^5.28.1"
 exifread = "^3.0.0"
 pillow = "^11.1.0"
 asyncio = "^3.4.3"
+serpapi = "^0.1.5"
 
 
 [build-system]
