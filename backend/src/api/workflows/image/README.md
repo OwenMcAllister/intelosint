@@ -1,9 +1,17 @@
 # Image Handling Protocol
 
-1. Metadata gets checked and goes through classifier agent (Pulls out geotagging, urls, etc)
-2. Goes through an image classifer that isolates different parts of the image (Faces, Text, buildings, etc)
+Images are expected to originate from a URL
+
+1. Metadata gets extracted
+2. Goes through an image classifer that isolates faces and text
 3. Faces that are visible get sent to face check id
-4. Text gets processed and sent to classifier agent
- - If the text is an address we go through the address protocol, if the text is a company name we go through that protoco, etc
-5. Image and isolated Image components get reverse image searched to try and identify as much information as possible
-6. All of this output is sent to the parsing agent which sorts through the information and presents it nicely
+4. Text, facecheckID output, and Metadata are returned to get parsed
+
+
+# Metadata_extractor
+
+Temp image file is created locally and then deleted to run exif operations on
+
+Per exifread docs: Returned tags will be a dictionary mapping names of Exif tags to their values in the file 
+
+extract_metadata returns a list of strings (tag dict contents) for consistency.
