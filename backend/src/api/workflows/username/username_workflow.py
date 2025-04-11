@@ -4,31 +4,35 @@ import os
 from typing import List
 
 # internal
-from src.globals.environment import Environment
 
 # external
-
+import asyncio
 
 async def search_username(username: str) -> List[str]:
 
     try:
-        result = subprocess.run(
-            ["sherlock", username, "--print-found"],
-            stdout = subprocess.PIPE,
-            stderr = subprocss.PIPE,
-            text = True,
-            timeout = 60
+        process = await asyncio.create_subprocess_exec(
+            "sherlock", username, "--print-found",
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE
         )
-        output = result.stdout
+
+        stdout, stderr = await process.communicate()
+
+        output = stdout.decode()
+        errors = stderr.decode()
 
         found_sites = []
         for line in output.splitlines():
             if line.startswith("[+]"):
-                found_sites.append(line)
+                parts = line.split(": ", 1)
+                if len(parts) == 2:
+                    url = parts[1].strip()
+                    found_sites.append(url)
 
         return found_sites
 
-    except subprocess.TimeoutExpired:
+    except asyncio.TimeoutError:
         return ["Sherlock proc timed out"]
 
     except Exception as e:
