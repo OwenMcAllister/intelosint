@@ -6,13 +6,13 @@ import io
 import os
 import time
 import httpx
-import asyncio
 from typing import List, Dict, Optional
 
 # internal
 from src.globals.environment import Environment
 
 # external
+import asyncio
 from pillow import Image
 from dotenv import load_dotenv
 
