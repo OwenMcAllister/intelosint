@@ -10,16 +10,12 @@ proxy_list = [proxy.strip() for proxy in proxies.strip().split('\n')]
 
 
 def format_query(query):
-    # Strip leading and trailing whitespace
     query = query.strip()
     
-    # Remove all special characters (keeping only letters and spaces)
     query = re.sub(r'[^a-zA-Z\s]', '', query)
     
-    # Split the string into words on spaces
     words = query.split()
     
-    # Capitalize the first letter of each word and join with dashes
     formatted_query = '-'.join(word.capitalize() for word in words)
     
     return formatted_query

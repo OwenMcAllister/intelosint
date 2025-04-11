@@ -1,4 +1,4 @@
-# Username_workflow uses Sherlock (in another process) to search for usernames
+# Username_workflow uses Sherlock (in another process) to search for usernames and queries breach data
 
 https://github.com/sherlock-project/sherlock
 
