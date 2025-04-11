@@ -28,6 +28,14 @@ FaceCheckID results are returned as a list of strings
 
 
 # Reverse imae search
+
 Synchronous SerpAI call put in a new thread to avoid concurrency issues
+
 Returns list of links w matching images 
+
 (We may want to return more here to get more out of a single API call)
+
+
+# Text recognition
+
+Easyocr character recognition library to extract strings in images
