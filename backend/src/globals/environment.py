@@ -10,3 +10,5 @@ class Environment(BaseSettings):
 
     FACECHECK_API_KEY: str
     SERPAPI_API_KEY: str
+
+    SNUSBASE_KEY: str
