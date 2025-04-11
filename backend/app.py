@@ -1,6 +1,5 @@
 # builtin
 from contextlib import asynccontextmanager
-import os
 
 # external
 from fastapi import FastAPI
@@ -8,7 +7,7 @@ from dotenv import load_dotenv
 
 # internal
 from src.routes import setup_routes
-from src.globals.environment import Environment
+from src.globals import Environment
 
 
 
