@@ -1,7 +1,9 @@
 # builtin
+from typing import List
 
 # internal
-from src.api.workflows.handle_image.image_workflow import image_workflow_start
+from src.api.models.data_models import NodeType
+from src.api.workflows.image.image_workflow import image_workflow_start
 
 # external
 
