@@ -8,9 +8,10 @@ export function createNodeFromNodeInfo(info: NodeInfo): Node {
             label: info.name,
             info: info.info,
             onMouseEnter: info.onMouseEnter,
-            onMouseLeave: info.onMouseLeave
+            onMouseLeave: info.onMouseLeave,
+            onSearch: info.onSearch
         }, 
-        position: { x: 100, y: 100 } 
+        position: info.position || {x: 100, y: 100}
     };
 
     return node;

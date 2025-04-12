@@ -1,31 +1,23 @@
 "use client";
 
-import { ReactFlow, Node, Edge, Background, useNodesState, useEdgesState } from "@xyflow/react";
+import { ReactFlow, Node, Edge, Background } from "@xyflow/react";
 import '@xyflow/react/dist/style.css';
 import InformationNode from "../components/info-node";
-import { createNodeFromNodeInfo } from "../util/functions";
 
 interface GraphProps {
-    initialNodeInfo: NodeInfo
+    initialNodes: Node[];
+    initialEdges: Edge[];
 }
 
-const initialNodes: Node[] = [];
-
-const initialEdges: Edge[] = [
-    // { id: "e1-2", source: "1", target: "2", type: "smoothstep" },
-];
-
-export default function Graph({ initialNodeInfo }: GraphProps) {
-    initialNodes.push(createNodeFromNodeInfo(initialNodeInfo));
-    const [nodes, setNodes] = useNodesState(initialNodes);
-    const [edges, setEdges] = useEdgesState(initialEdges);
+export default function Graph({ initialNodes, initialEdges }: GraphProps) {
 
     return (
         <div style={{ width: "100%", height: "100vh" }}>
             <ReactFlow
-                nodes={nodes}
+                nodes={initialNodes}
                 edges={initialEdges}
                 nodeTypes={{ custom: InformationNode }}
+                nodesDraggable={false}
             >
                 <Background />
             </ReactFlow>

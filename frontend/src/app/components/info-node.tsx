@@ -1,23 +1,13 @@
 import { Handle, Node, NodeProps, Position } from "@xyflow/react";
 import { useState } from "react";
 
-interface InformationNodeData extends Record<string, string | Object | undefined> {
-    label: string;
-    info?: Object;
-    isSearched?: boolean;
-    onMouseEnter?: () => void;
-    onMouseLeave?: () => void;
-}
-
-export default function InformationNode({ data }: NodeProps<Node<InformationNodeData, string>>) {
+export default function InformationNode({ data }: NodeProps<Node<NodeInfo, string>>) {
 
     const [searched, setSearched] = useState<boolean>(data.isSearched || false);
 
     function handleRequest() {
-        // send request to backend or something
-
+        data.onSearch();
         setSearched(true);
-        console.log(`Button clicked on ${data.label}`);
     }
 
     return (
@@ -28,7 +18,7 @@ export default function InformationNode({ data }: NodeProps<Node<InformationNode
                 onMouseEnter={() => data.onMouseEnter && data.onMouseEnter()}
                 onMouseLeave={() => data.onMouseLeave && data.onMouseLeave()}
             >
-                <div>{data.label}</div>
+                <div className="block mx-auto text-center">{data.label}</div>
                 {!searched &&
                     <button
                         type="button"
