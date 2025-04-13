@@ -1,4 +1,3 @@
-import { Node } from '@xyflow/react';
 import { InfoNode, NodeInfo } from './types';
 
 export function createNodeFromNodeInfo(info: NodeInfo): InfoNode {
@@ -11,3 +10,4 @@ export function createNodeFromNodeInfo(info: NodeInfo): InfoNode {
 
     return node;
 }
+
