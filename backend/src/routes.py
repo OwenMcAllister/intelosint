@@ -29,9 +29,11 @@ def setup_websocket(app: FastAPI):
 
         try:
             while True:
-                response = await websocket.receive()
+                response = await websocket.receive_json()
                 print(response)
-                parentId: str = response.get("text", "")
+                
+                parentId: str = response["id"]
+                parentIndex: int = response["index"]
                 
                 nodes: list[NodeResponse] = []
 
@@ -40,7 +42,7 @@ def setup_websocket(app: FastAPI):
                     testNode: NodeResponse = NodeResponse(id=str(uuid4()), name="What?", info=info)
                     nodes.append(testNode)
 
-                children: Nodes = Nodes(parentId=parentId, nodes=nodes)
+                children: Nodes = Nodes(parentId=parentId, parentIndex=parentIndex, nodes=nodes)
 
                 await websocket.send_json(children.model_dump())
         except WebSocketDisconnect:

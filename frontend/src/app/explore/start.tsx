@@ -22,8 +22,8 @@ export default function Start({ onQuery }: StartProps) {
             <h1 className="text-3xl font-bold mb-8">Explore Data</h1>
             <form onSubmit={handleSubmit} className="w-full max-w-md">
                 <div className="mb-4">
-                    <label htmlFor="query" className="block text-sm font-medium mb-2">
-                        I need to know more about
+                    <label htmlFor="query" className="block font-medium mb-2">
+                        I would like to know more about
                     </label>
                     <input
                         type="text"

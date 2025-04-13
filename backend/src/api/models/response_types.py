@@ -15,4 +15,5 @@ class NodeResponse(BaseModel):
 
 class Nodes(BaseModel):
     parentId: str
+    parentIndex: int
     nodes: list[NodeResponse]

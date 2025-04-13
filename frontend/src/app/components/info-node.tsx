@@ -1,7 +1,8 @@
 import { Handle, Node, NodeProps, Position } from "@xyflow/react";
 import { useState } from "react";
+import { InfoNode } from "../util/types";
 
-export default function InformationNode({ data }: NodeProps<Node<NodeInfo, string>>) {
+export default function InformationNode({ data }: NodeProps<InfoNode>) {
 
     const [searched, setSearched] = useState<boolean>(data.isSearched || false);
 
@@ -18,7 +19,7 @@ export default function InformationNode({ data }: NodeProps<Node<NodeInfo, strin
                 onMouseEnter={() => data.onMouseEnter && data.onMouseEnter()}
                 onMouseLeave={() => data.onMouseLeave && data.onMouseLeave()}
             >
-                <div className="block mx-auto text-center">{data.label}</div>
+                <div className="block mx-auto text-center">{data.name}</div>
                 {!searched &&
                     <button
                         type="button"

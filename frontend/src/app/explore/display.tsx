@@ -6,6 +6,7 @@ import Graph from './graph';
 import InfoDisplay from '../components/info-display';
 import { Node, Edge } from '@xyflow/react';
 import { createNodeFromNodeInfo } from '../util/functions';
+import { InfoNode, NodeInfo, NodeResponse, Nodes } from '../util/types';
 
 interface QueryData {
     query: string;
@@ -20,7 +21,7 @@ export default function Display() {
 
     const [hoverInfo, setHoverInfo] = useState<Object | undefined>(undefined);
 
-    const [nodes, setNodes] = useState<Node[]>([]);
+    const [nodes, setNodes] = useState<InfoNode[]>([]);
     const [edges, setEdges] = useState<Edge[]>([]);
 
     const websocketRef = useRef<WebSocket | null>(null);
@@ -30,41 +31,57 @@ export default function Display() {
         websocketRef.current = ws;
 
         ws.onmessage = (message) => {
+            console.log("Received Message");
             const children: Nodes = JSON.parse(message.data);
             const parentId: string = children.parentId;
+            const parentIndex: number = children.parentIndex;
 
             const childrenIds: string[] = [];
+            let baseIndex: number;
 
-            children.nodes.map((response: NodeResponse) => {
-                const nodeInfo: NodeInfo = {
-                    ...response,
-                    onMouseEnter: () => setHoverInfo(response.info),
-                    onMouseLeave: () => setHoverInfo(undefined),
-                    onSearch: () => queryWebsocket(response.id),
-                    position: { x: getRandomInt(100, 800), y: getRandomInt(100, 800) }
-                }
-
-                childrenIds.push(response.id);
-
-                const node = createNodeFromNodeInfo(nodeInfo);
-
-                console.log(node);
-
-                setNodes(nodes => [...nodes, node])
+            setNodes(currentNodes => {
+                baseIndex = currentNodes.length;
+                return currentNodes;
             });
 
-            setNodes(nodes =>
-                nodes.map(node =>
-                    node.id === parentId ? { ...node, data: { ...node.data, children: childrenIds } } : node
-                )
-            );
+            const childrenIndices: number[] = [];
+
+            const newChildNodes = children.nodes.map((response: NodeResponse, index: number) => {
+                const nodeIndex: number = baseIndex + index;
+                childrenIndices.push(nodeIndex);
+                childrenIds.push(response.id);
+
+                return createNodeFromNodeInfo({
+                    ...response,
+                    index: nodeIndex,
+                    parentIndex,
+                    childrenIndices: [],
+                    onMouseEnter: () => setHoverInfo(response.info),
+                    onMouseLeave: () => setHoverInfo(undefined),
+                    onSearch: () => queryWebsocket(response.id, nodeIndex),
+                    position: { x: getRandomInt(100, 800), y: getRandomInt(100, 800) }
+                });
+            });
+
+            setNodes(nodes => {
+                const updatedNodes = [...nodes];
+
+                updatedNodes.push(...newChildNodes);
+
+                const parentNodeIndex = updatedNodes.findIndex(node => node.id === parentId);
+                if (parentNodeIndex !== -1) {
+                    updatedNodes[parentNodeIndex].data.childrenIndices = childrenIndices;
+                }
+
+                return updatedNodes;
+            });
 
             setEdges(edges => [
                 ...edges,
-                ...childrenIds.map(childId => ({
-                    id: `${parentId}-${childId}`,
+                ...childrenIds.map(id => ({
+                    id: `${parentId}-${id}`,
                     source: parentId,
-                    target: childId,
+                    target: id,
                     type: "smoothstep"
                 }))
             ]);
@@ -76,25 +93,31 @@ export default function Display() {
         }
     }, [])
 
-    const queryWebsocket = (id: string) => {
+    const queryWebsocket = (id: string, index: number) => {
         console.log(`Querying websocket with ID ${id}`);
         if (websocketRef.current) {
             console.log("What?");
-            websocketRef.current.send(id);
+            const data = {
+                id: id,
+                index: index
+            }
+            websocketRef.current.send(JSON.stringify(data));
         } else {
             console.error("WebSocket is not connected");
         }
     }
 
     const handleQuery = (data: QueryData) => {
-        // TODO: send req to backend
 
         const nodeInfo: NodeInfo = {
-            id: "1",
+            id: "root",
             name: data.query,
+            index: 0,
+            parentIndex: undefined,
+            childrenIndices: [],
             onMouseEnter: () => setHoverInfo({ Test: "Yay!" }),
             onMouseLeave: () => setHoverInfo(undefined),
-            onSearch: () => queryWebsocket("1"),
+            onSearch: () => queryWebsocket("root", 0),
             position: { x: 200, y: 200 }
         };
 

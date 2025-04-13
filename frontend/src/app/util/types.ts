@@ -1,9 +1,12 @@
+import { Node } from "@xyflow/react";
 
 
-interface NodeInfo extends Record<string, string | any | undefined>{
+export interface NodeInfo extends Record<string, string | any | undefined>{
     id: string;
     name: string;
-    children?: string[];
+    index: number;
+    childrenIndices: number[];
+    parentIndex: number | undefined;
     info?: any;
     isSearched?: boolean;
     onMouseEnter?: () => void;
@@ -12,18 +15,21 @@ interface NodeInfo extends Record<string, string | any | undefined>{
     position?: NodePosition
 }
 
-interface NodePosition {
+export interface NodePosition {
     x: number;
     y: number;
 }
 
-interface NodeResponse {
+export interface NodeResponse {
     id: string;
     name: string;
     info: any;
 }
 
-interface Nodes {
+export interface Nodes {
     parentId: string;
+    parentIndex: number;
     nodes: NodeResponse[];
 }
+
+export type InfoNode = Node<NodeInfo, string>;
