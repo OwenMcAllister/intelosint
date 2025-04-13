@@ -1,4 +1,4 @@
-import { InfoNode } from "./types";
+import type { InfoNode } from "./types";
 
 interface NodeFocusFields {
     focusedNode: InfoNode | null;
