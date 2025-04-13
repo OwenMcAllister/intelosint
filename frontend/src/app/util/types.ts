@@ -1,6 +1,5 @@
 import type { Node } from "@xyflow/react";
 
-
 // biome-ignore lint/suspicious/noExplicitAny: Will depend on what backend types we decide on, can change to some basic id later
 export interface NodeInfo extends Record<string, string | any | undefined> {
     id: string;
@@ -8,6 +7,8 @@ export interface NodeInfo extends Record<string, string | any | undefined> {
     index: number;
     childrenIndices: number[];
     parentIndex: number | undefined;
+    parentId: string | undefined;
+    level: number; // Add level property to track distance from root
     // biome-ignore lint/suspicious/noExplicitAny: Same as above
     info?: any;
     isSearched?: boolean;
@@ -48,6 +49,8 @@ export interface NewChildNodesInput {
     childrenIndices: number[];
     childrenIds: string[];
     parentIndex: number;
+    parentLevel: number;
+    parentId: string;
 
     // biome-ignore lint/suspicious/noExplicitAny: Again, depends on backend info for now
     onMouseEnter: (info: any | undefined) => void;
@@ -65,4 +68,8 @@ export interface NewChildNode {
     onMouseLeave: () => void;
     onSearch: () => void;
     position?: NodePosition;
+}
+
+export interface LayoutPosition extends NodePosition {
+    available: boolean;
 }

@@ -13,6 +13,7 @@ import {
 	parseMessage,
 	updateChildrenOfParent,
 } from "../util/functions";
+import { getRootPosition, layoutNodes } from "../util/layout"; // Import our new layout function
 import type { InfoNode, NodeInfo, NodeResponse } from "../util/types";
 
 interface QueryData {
@@ -47,6 +48,7 @@ export default function Display() {
 					childrenIds,
 					childrenIndices,
 					parentIndex,
+					parentId,
 				),
 			);
 
@@ -65,15 +67,19 @@ export default function Display() {
 		childrenIds: string[],
 		childrenIndices: number[],
 		parentIndex: number,
+		parentId: string,
 	): InfoNode[] => {
 		const baseIndex = currentNodes.length;
+		const parentLevel = currentNodes[parentIndex].data.level;
 
 		const childNodes: InfoNode[] = createNewChildNodes({
 			nodes,
 			baseIndex,
 			childrenIds,
 			childrenIndices,
+			parentLevel,
 			parentIndex,
+			parentId,
 			onMouseEnter: setHoverInfo,
 			onMouseLeave: setHoverInfo,
 			onSearch: queryWebsocket,
@@ -83,9 +89,7 @@ export default function Display() {
 		updatedNodes = addUniqueByID(updatedNodes, childNodes);
 		updateChildrenOfParent(updatedNodes, parentIndex, childrenIndices);
 
-		console.log(updatedNodes);
-
-		return updatedNodes;
+		return layoutNodes(updatedNodes);
 	};
 
 	const edgeUpdate = (
@@ -95,8 +99,6 @@ export default function Display() {
 	): Edge[] => {
 		const newEdges = generateParentChildEdges(childrenIds, parentId);
 		const combined = addUniqueByID(currentEdges, newEdges);
-
-		console.log(combined);
 		return combined;
 	};
 
@@ -117,17 +119,18 @@ export default function Display() {
 			id: "root",
 			name: data.query,
 			index: 0,
+			level: 0,
 			parentIndex: undefined,
+			parentId: undefined,
 			childrenIndices: [],
 			onMouseEnter: () => setHoverInfo({ Test: "Yay!" }),
 			onMouseLeave: () => setHoverInfo(undefined),
 			onSearch: () => queryWebsocket("root", 0),
-			position: { x: 200, y: 200 },
+			position: getRootPosition(),
 		};
 
 		const node = createNodeFromNodeInfo(nodeInfo);
-
-		setNodes((nodes) => [...nodes, node]);
+		setNodes([node]);
 		setQueryMade(true);
 	};
 

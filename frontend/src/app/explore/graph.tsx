@@ -31,7 +31,6 @@ function InternalGraph({ initialNodes, initialEdges }: GraphProps) {
 	const [focusedNode, setFocusedNode] = useState<InfoNode | null>(null);
 	const reactFlow = useReactFlow();
 
-	// biome-ignore lint/correctness/useExhaustiveDependencies: Just wrong, needs reactFlow
 	const focusNode = useCallback(
 		(index: number) => {
 			if (index >= 0 && index < initialNodes.length) {
@@ -40,7 +39,7 @@ function InternalGraph({ initialNodes, initialEdges }: GraphProps) {
 				handleSetParent(initialNodes, node);
 			}
 		},
-		[initialNodes, reactFlow],
+		[initialNodes],
 	);
 
 	const handleSetFocus = (node: InfoNode) => {
@@ -59,6 +58,16 @@ function InternalGraph({ initialNodes, initialEdges }: GraphProps) {
 		}
 		setParentNode(parent);
 	};
+
+	useEffect(() => {
+		if (initialNodes.length > 0) {
+			focusNode(0);
+
+			if (initialNodes.length > 1) {
+				reactFlow.fitView({ padding: 0.2, duration: 800 });
+			}
+		}
+	}, [initialNodes, focusNode, reactFlow]);
 
 	useEffect(() => {
 		const handleKeyDown = (event: KeyboardEvent) => {
@@ -83,6 +92,8 @@ function InternalGraph({ initialNodes, initialEdges }: GraphProps) {
 				edges={initialEdges}
 				nodeTypes={{ custom: InformationNode }}
 				nodesDraggable={false}
+				fitView
+				defaultViewport={{ x: 0, y: 0, zoom: 1 }}
 			>
 				<Background />
 			</ReactFlow>

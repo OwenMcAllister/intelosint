@@ -1,15 +1,24 @@
-import type { Edge } from '@xyflow/react';
-import type { InfoNode, NewChildNode, NewChildNodesInput, NodeInfo, NodeResponse, Nodes, WebsocketMessage } from './types';
+import type { Edge, XYPosition } from '@xyflow/react';
+import type { InfoNode, NewChildNode, NewChildNodesInput, NodeInfo, NodePosition, NodeResponse, Nodes, WebsocketMessage } from './types';
+import { calculateBestPosition } from './layout';
 
-export function createNodeFromNodeInfo(info: NodeInfo): InfoNode {
-    const node: InfoNode = {
-        id: info.id,
-        type: "custom",
-        data: info,
-        position: info.position || { x: 100, y: 100 }
+const NULL_POSITION: NodePosition = { x: 0, y: 0 };
+
+export function createNodeFromNodeInfo(nodeInfo: NodeInfo): InfoNode {
+    console.log(nodeInfo);
+    return {
+        id: nodeInfo.id,
+        type: 'custom',
+        position: positionToXY(nodeInfo.position),
+        data: nodeInfo,
     };
+}
 
-    return node;
+function positionToXY(pos: NodePosition | undefined): XYPosition {
+    if (!pos) {
+        return { x: 0, y: 0 }
+    }
+    return (pos as XYPosition)
 }
 
 export function parseMessage(message: MessageEvent): WebsocketMessage {
@@ -21,24 +30,32 @@ export function parseMessage(message: MessageEvent): WebsocketMessage {
 }
 
 export function createNewChildNodes(input: NewChildNodesInput): InfoNode[] {
-    const newChildNodes = input.nodes.map((response: NodeResponse, arrayIndex: number) => {
-        const nodeIndex: number = input.baseIndex + arrayIndex;
-        input.childrenIndices.push(nodeIndex);
-        input.childrenIds.push(response.id);
+    const childLevel = input.parentLevel + 1;
 
-        return createNodeFromNodeInfo({
-            ...response,
+    return input.nodes.map((node, i) => {
+        const position = NULL_POSITION;
+
+        const nodeIndex = input.baseIndex + i;
+
+        const nodeInfo: NodeInfo = {
+            id: node.id,
+            name: node.name,
             index: nodeIndex,
+            level: childLevel,
             parentIndex: input.parentIndex,
+            parentId: input.parentId,
             childrenIndices: [],
-            onMouseEnter: () => input.onMouseEnter(response.info),
+            onMouseEnter: () => input.onMouseEnter(node.info),
             onMouseLeave: () => input.onMouseLeave(undefined),
-            onSearch: () => input.onSearch(response.id, nodeIndex),
-            position: { x: getRandomInt(100, 800), y: getRandomInt(100, 800) },
-        });
-    });
+            onSearch: () => input.onSearch(node.id, nodeIndex),
+            position
+        };
 
-    return newChildNodes;
+        input.childrenIndices.push(nodeIndex);
+        input.childrenIds.push(node.id);
+
+        return createNodeFromNodeInfo(nodeInfo);
+    });
 }
 
 export function updateChildrenOfParent(nodes: InfoNode[], parentIndex: number, childrenIndices: number[]) {

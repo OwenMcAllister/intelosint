@@ -14,11 +14,13 @@ export default function InformationNode({ data }: NodeProps<InfoNode>) {
 		<>
 			<Handle type="target" position={Position.Top} />
 			<div
-				className="p-3.5 border border-black rounded-md bg-blue-200 space-y-1.5"
+				className="p-3.5 border border-black rounded-md bg-blue-200 space-y-1.5 h-20 w-28 flex flex-col justify-center"
 				onMouseEnter={() => data.onMouseEnter?.()}
 				onMouseLeave={() => data.onMouseLeave?.()}
 			>
-				<div className="block mx-auto text-center">{data.name}</div>
+				<div className={`block mx-auto text-center ${searched && "text-lg"}`}>
+					{data.name}
+				</div>
 				{!searched && (
 					<button
 						type="button"
