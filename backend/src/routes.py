@@ -11,7 +11,8 @@ from src.api.models.response_types import NodeResponse, NodeInfo, Nodes
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 import random
 
-MAX_NEWNODES: int = 6
+MIN_NEWNODES: int = 3
+MAX_NEWNODES: int = 10
 
 def setup_routes(app: FastAPI):
 
@@ -52,7 +53,7 @@ def setup_websocket(app: FastAPI):
                 
                 nodes: list[NodeResponse] = []
 
-                num_nodes = random.randint(0, MAX_NEWNODES)
+                num_nodes = random.randint(MIN_NEWNODES, MAX_NEWNODES)
 
                 for i in range(num_nodes):
                     info: NodeInfo = NodeInfo(description=f"Test node {i}")

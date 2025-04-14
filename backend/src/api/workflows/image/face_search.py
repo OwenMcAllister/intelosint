@@ -13,7 +13,8 @@ from src.globals.environment import Environment
 
 # external
 import asyncio
-from pillow import Image
+from PIL import Image
+
 from dotenv import load_dotenv
 
 

@@ -14,7 +14,7 @@ class Neo4jDriver:
         self.uri = environment.NEO4J_URI
         self.user = environment.NEO4J_USER
         self.password = environment.NEO4J_PASSWORD
-        self.driver = AsyncGraphDatabase.driver(self.uri, auth=(self.user, self.password))
+        # self.driver = AsyncGraphDatabase.driver(self.uri, auth=(self.user, self.password))
 
     async def close(self):
         await self.driver.close()
