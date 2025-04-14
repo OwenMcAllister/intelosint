@@ -1,11 +1,11 @@
-import Results from "./results";
+import Display from "./display";
 
 
 export default function Page() {
 
     return (
         <div>
-            <Results />
+            <Display />
         </div>
     );
 }
