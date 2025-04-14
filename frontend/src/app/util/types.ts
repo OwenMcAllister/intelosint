@@ -73,3 +73,8 @@ export interface NewChildNode {
 export interface LayoutPosition extends NodePosition {
     available: boolean;
 }
+
+export interface Level {
+    total: number,
+    indices: number[]
+}

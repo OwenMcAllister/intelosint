@@ -1,48 +1,53 @@
-import type { InfoNode, LayoutPosition, NodePosition } from "./types";
+import type { InfoNode, LayoutPosition, Level, NodePosition } from "./types";
 
 const CENTER_X = 300;
 const CENTER_Y = 400;
-
-const MAX_CHILD_NODES = 3;
 
 const BASE_RADIUS = 150;
 const LEVEL_MULTIPLIER = 1.3;
 
 const NODE_WIDTH = 112;
 const NODE_HEIGHT = 80;
+const SAME_LEVEL_RADII_SPACING = NODE_HEIGHT / 2 + NODE_WIDTH / 2;
+const NODE_SPACING = 10;
 
 export function layoutNodes(nodes: InfoNode[]): InfoNode[] {
     const newNodes = [...nodes];
-    const levelMap = groupNodesByLevel(newNodes);
-    const maxLevel = Math.max(...Array.from(levelMap.keys()));
+    const levelMap: Map<number, Level> = groupNodesByLevel(newNodes);
     const nodePositions = new Map<string, NodePosition>();
-    const allAvailablePositions = generatePossiblePositions(maxLevel);
+    const allAvailablePositions = generatePossiblePositions(levelMap);
 
     for (const level of Array.from(levelMap.keys()).sort()) {
-        const nodeIndices = levelMap.get(level) || [];
-        calculateLevelPositions(level, nodeIndices, newNodes, nodePositions, allAvailablePositions);
+        const levelNodes = levelMap.get(level) || { total: 0, indices: [] };
+        calculateLevelPositions(level, levelNodes, newNodes, nodePositions, allAvailablePositions);
     }
 
     return newNodes;
 }
 
 export function groupNodesByLevel(nodes: InfoNode[]) {
-    const levelMap = new Map<number, number[]>();
+    const levelMap = new Map<number, Level>();
 
     nodes.forEach((node, index) => {
         const level = node.data.level || 0;
         if (!levelMap.has(level)) {
-            levelMap.set(level, []);
+            levelMap.set(level, { total: 0, indices: [] });
         }
-        levelMap.get(level)?.push(index);
+
+        const currentLevel = levelMap.get(level);
+
+        if (currentLevel === undefined) {
+            throw new Error(`Level object not found for level ${level}`);
+        }
+
+        currentLevel.indices.push(index);
+        currentLevel.total += 1;
     });
 
     return levelMap;
 }
 
-function generatePossiblePositions(
-    maxLevel: number,
-): Map<number, LayoutPosition[]> {
+function generatePossiblePositions(levelMap: Map<number, Level>): Map<number, LayoutPosition[]> {
     const positionMap: Map<number, LayoutPosition[]> = new Map();
 
     const rootPosition: LayoutPosition = {
@@ -50,20 +55,55 @@ function generatePossiblePositions(
         y: CENTER_Y,
         available: true,
     };
-
     positionMap.set(0, [rootPosition]);
 
-    for (let i = 1; i <= maxLevel; i++) {
-        const radius = BASE_RADIUS * (1 + (i - 1) * LEVEL_MULTIPLIER ** (i - 1));
-        const totalPositions = MAX_CHILD_NODES ** i;
-        const positions = generatePossibleLevelPositions(i, radius, totalPositions);
-        positionMap.set(i, positions);
+    let level = 1;
+    let levelInfo: Level | undefined = levelMap.get(level);
+    let prevNodeCount = 0;
+
+    while (levelInfo !== undefined) {
+        const radius = BASE_RADIUS * (1 + (level - 1) * LEVEL_MULTIPLIER ** (level - 1));
+        const totalPositions = getTotalPositions(level, levelInfo.total, prevNodeCount);
+        prevNodeCount = totalPositions;
+
+        const positions = generatePossibleLevelPositions(levelInfo, radius);
+
+        positionMap.set(level, positions);
+
+        level++;
+        levelInfo = levelMap.get(level);
     }
 
     return positionMap;
 }
 
-function generatePossibleLevelPositions(level: number, radius: number, totalPositions: number): LayoutPosition[] {
+function getTotalPositions(level: number, total: number, prev: number): number {
+    if (level > 1) {
+        return Math.max(total, prev * 3);
+    }
+    return total;
+}
+
+// also return the used radius?
+function generatePossibleLevelPositions(level: Level, baseRadius: number): LayoutPosition[] {
+    const positions: LayoutPosition[] = [];
+
+    let positionsToAllocate = level.total;
+    let radius = baseRadius;
+
+    while (positionsToAllocate > 0) {
+        const positionsOnCircle = calculateMaxNodesOnCircle(radius);
+        const circlePositions = generateRadialPositions(radius, positionsOnCircle);
+
+        positions.push(...circlePositions);
+        positionsToAllocate -= positionsOnCircle;
+        radius += SAME_LEVEL_RADII_SPACING;
+    }
+
+    return positions;
+}
+
+function generateRadialPositions(radius: number, totalPositions: number): LayoutPosition[] {
     const positions: LayoutPosition[] = [];
 
     for (let j = 0; j < totalPositions; j++) {
@@ -76,14 +116,20 @@ function generatePossibleLevelPositions(level: number, radius: number, totalPosi
     return positions;
 }
 
+export function calculateMaxNodesOnCircle(radius: number): number {
+    const effectiveNodeWidth = NODE_WIDTH + NODE_SPACING;
+    const circumference = 2 * Math.PI * radius;
+    return Math.floor(circumference / effectiveNodeWidth);
+}
+
 function calculateLevelPositions(
     level: number,
-    nodeIndices: number[],
+    levelNodes: Level,
     nodes: InfoNode[],
     nodePositions: Map<string, NodePosition>,
     allAvailablePositions: Map<number, LayoutPosition[]>,
 ) {
-    for (const nodeIndex of nodeIndices) {
+    for (const nodeIndex of levelNodes.indices) {
         const node = nodes[nodeIndex];
 
         const parentPosition = getParentPosition(nodePositions, node.data.parentId);
