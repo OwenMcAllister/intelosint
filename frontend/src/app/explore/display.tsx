@@ -16,6 +16,8 @@ import {
 import { getRootPosition, layoutNodes } from "../util/layout"; // Import our new layout function
 import type { InfoNode, NodeInfo, NodeResponse } from "../util/types";
 
+const BACKEND_URL = process.env.BACKEND_URL;
+
 interface QueryData {
 	query: string;
 }
@@ -32,7 +34,7 @@ export default function Display() {
 	const websocketRef = useRef<WebSocket | null>(null);
 
 	useEffect(() => {
-		const ws = new WebSocket("ws://localhost:8000/ws/node");
+		const ws = new WebSocket(`${BACKEND_URL}/ws/node/test`);
 		websocketRef.current = ws;
 
 		ws.onmessage = (message) => {

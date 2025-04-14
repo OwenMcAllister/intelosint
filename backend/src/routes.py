@@ -9,6 +9,9 @@ from src.api.models.response_types import NodeResponse, NodeInfo, Nodes
 
 # external
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+import random
+
+MAX_NEWNODES: int = 6
 
 def setup_routes(app: FastAPI):
 
@@ -29,6 +32,18 @@ def setup_websocket(app: FastAPI):
 
         try:
             while True:
+                await websocket.receive_json()
+
+                await websocket.send("Nothing yet")
+        except WebSocketDisconnect:
+            print("Websocket connection closed")
+
+    @app.websocket("/ws/node/test")
+    async def test_endpoint(websocket: WebSocket):
+        await websocket.accept()
+
+        try:
+            while True:
                 response = await websocket.receive_json()
                 print(response)
                 
@@ -37,8 +52,10 @@ def setup_websocket(app: FastAPI):
                 
                 nodes: list[NodeResponse] = []
 
-                for i in range(3):
-                    info: NodeInfo = NodeInfo(description="A test node")
+                num_nodes = random.randint(0, MAX_NEWNODES)
+
+                for i in range(num_nodes):
+                    info: NodeInfo = NodeInfo(description=f"Test node {i}")
                     testNode: NodeResponse = NodeResponse(id=str(uuid4()), name="What?", info=info)
                     nodes.append(testNode)
 
