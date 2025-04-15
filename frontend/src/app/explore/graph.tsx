@@ -27,19 +27,33 @@ export default function Graph({ initialNodes, initialEdges }: GraphProps) {
 }
 
 function InternalGraph({ initialNodes, initialEdges }: GraphProps) {
+	const [nodes, setNodes] = useState(initialNodes);
+	const [edges, setEdges] = useState(initialEdges);
 	const [parentNode, setParentNode] = useState<InfoNode | null>(null);
 	const [focusedNode, setFocusedNode] = useState<InfoNode | null>(null);
 	const reactFlow = useReactFlow();
 
+	useEffect(() => {
+		const updatedNodes = initialNodes.map((node) => ({
+			...node,
+			position: { ...node.position },
+		}));
+		setNodes(updatedNodes);
+	}, [initialNodes]);
+
+	useEffect(() => {
+		setEdges(initialEdges);
+	}, [initialEdges]);
+
 	const focusNode = useCallback(
 		(index: number) => {
-			if (index >= 0 && index < initialNodes.length) {
-				const node = initialNodes[index];
+			if (index >= 0 && index < nodes.length) {
+				const node = nodes[index];
 				handleSetFocus(node);
-				handleSetParent(initialNodes, node);
+				handleSetParent(nodes, node);
 			}
 		},
-		[initialNodes],
+		[nodes],
 	);
 
 	const handleSetFocus = (node: InfoNode) => {
@@ -60,14 +74,14 @@ function InternalGraph({ initialNodes, initialEdges }: GraphProps) {
 	};
 
 	useEffect(() => {
-		if (initialNodes.length > 0) {
+		if (nodes.length > 0) {
 			focusNode(0);
 
-			if (initialNodes.length > 1) {
+			if (nodes.length > 1) {
 				reactFlow.fitView({ padding: 0.2, duration: 800 });
 			}
 		}
-	}, [initialNodes, focusNode, reactFlow]);
+	}, [nodes, focusNode, reactFlow]);
 
 	useEffect(() => {
 		const handleKeyDown = (event: KeyboardEvent) => {
@@ -88,8 +102,8 @@ function InternalGraph({ initialNodes, initialEdges }: GraphProps) {
 	return (
 		<div style={{ width: "100%", height: "100vh" }}>
 			<ReactFlow
-				nodes={initialNodes}
-				edges={initialEdges}
+				nodes={nodes}
+				edges={edges}
 				nodeTypes={{ custom: InformationNode }}
 				nodesDraggable={false}
 				fitView

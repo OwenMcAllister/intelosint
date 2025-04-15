@@ -34,7 +34,6 @@ export function createNewChildNodes(input: NewChildNodesInput): InfoNode[] {
 
     return input.nodes.map((node, i) => {
         const position = NULL_POSITION;
-
         const nodeIndex = input.baseIndex + i;
 
         const nodeInfo: NodeInfo = {

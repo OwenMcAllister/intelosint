@@ -13,7 +13,7 @@ import {
 	parseMessage,
 	updateChildrenOfParent,
 } from "../util/functions";
-import { getRootPosition, layoutNodes } from "../util/layout"; // Import our new layout function
+import { getRootPosition, layoutNodes } from "../util/layout";
 import type { InfoNode, NodeInfo, NodeResponse } from "../util/types";
 
 const BACKEND_URL = process.env.BACKEND_URL;
@@ -91,7 +91,12 @@ export default function Display() {
 		updatedNodes = addUniqueByID(updatedNodes, childNodes);
 		updateChildrenOfParent(updatedNodes, parentIndex, childrenIndices);
 
-		return layoutNodes(updatedNodes);
+		const layoutedNodes = layoutNodes(updatedNodes);
+
+		return layoutedNodes.map((node) => ({
+			...node,
+			position: { ...node.position },
+		}));
 	};
 
 	const edgeUpdate = (

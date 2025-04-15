@@ -4,12 +4,12 @@ const CENTER_X = 300;
 const CENTER_Y = 400;
 
 const BASE_RADIUS = 150;
-const LEVEL_MULTIPLIER = 1.6;
+const LEVEL_MULTIPLIER = 1.7;
 
 const NODE_WIDTH = 112;
 const NODE_HEIGHT = 80;
-const SAME_LEVEL_RADII_SPACING = (NODE_HEIGHT + NODE_WIDTH) / 1.5;
-const NODE_SPACING = 10;
+const SAME_LEVEL_RADII_SPACING = (NODE_HEIGHT + NODE_WIDTH) / 1.25;
+const NODE_SPACING = 20;
 
 export function layoutNodes(nodes: InfoNode[]): InfoNode[] {
     const newNodes = [...nodes];

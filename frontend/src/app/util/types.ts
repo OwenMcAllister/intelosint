@@ -8,7 +8,7 @@ export interface NodeInfo extends Record<string, string | any | undefined> {
     childrenIndices: number[];
     parentIndex: number | undefined;
     parentId: string | undefined;
-    level: number; // Add level property to track distance from root
+    level: number;
     // biome-ignore lint/suspicious/noExplicitAny: Same as above
     info?: any;
     isSearched?: boolean;
