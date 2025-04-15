@@ -34,7 +34,7 @@ export default function Display() {
 	const websocketRef = useRef<WebSocket | null>(null);
 
 	useEffect(() => {
-		const ws = new WebSocket(`${BACKEND_URL}/ws/node/test`);
+		const ws = new WebSocket("ws://localhost:8000/ws/node/test");
 		websocketRef.current = ws;
 
 		ws.onmessage = (message) => {

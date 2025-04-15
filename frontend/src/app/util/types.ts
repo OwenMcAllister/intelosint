@@ -75,6 +75,11 @@ export interface LayoutPosition extends NodePosition {
 }
 
 export interface Level {
-    total: number,
-    indices: number[]
+    total: number;
+    indices: number[];
+}
+
+export interface PositionRadius {
+    endRadius: number;
+    positions: LayoutPosition[];
 }

@@ -1,14 +1,14 @@
-import type { InfoNode, LayoutPosition, Level, NodePosition } from "./types";
+import type { InfoNode, LayoutPosition, Level, NodePosition, PositionRadius } from "./types";
 
 const CENTER_X = 300;
 const CENTER_Y = 400;
 
 const BASE_RADIUS = 150;
-const LEVEL_MULTIPLIER = 1.3;
+const LEVEL_MULTIPLIER = 1.6;
 
 const NODE_WIDTH = 112;
 const NODE_HEIGHT = 80;
-const SAME_LEVEL_RADII_SPACING = NODE_HEIGHT / 2 + NODE_WIDTH / 2;
+const SAME_LEVEL_RADII_SPACING = (NODE_HEIGHT + NODE_WIDTH) / 1.5;
 const NODE_SPACING = 10;
 
 export function layoutNodes(nodes: InfoNode[]): InfoNode[] {
@@ -60,15 +60,18 @@ function generatePossiblePositions(levelMap: Map<number, Level>): Map<number, La
     let level = 1;
     let levelInfo: Level | undefined = levelMap.get(level);
     let prevNodeCount = 0;
+    let prevRadius = 0;
 
     while (levelInfo !== undefined) {
-        const radius = BASE_RADIUS * (1 + (level - 1) * LEVEL_MULTIPLIER ** (level - 1));
+        const radius = prevRadius + BASE_RADIUS * (LEVEL_MULTIPLIER)
         const totalPositions = getTotalPositions(level, levelInfo.total, prevNodeCount);
         prevNodeCount = totalPositions;
 
-        const positions = generatePossibleLevelPositions(levelInfo, radius);
+        const output = generatePossibleLevelPositions(level, levelInfo, radius);
 
-        positionMap.set(level, positions);
+        positionMap.set(level, output.positions);
+
+        prevRadius = output.endRadius;
 
         level++;
         levelInfo = levelMap.get(level);
@@ -84,23 +87,27 @@ function getTotalPositions(level: number, total: number, prev: number): number {
     return total;
 }
 
-// also return the used radius?
-function generatePossibleLevelPositions(level: Level, baseRadius: number): LayoutPosition[] {
+function generatePossibleLevelPositions(level: number, levelInfo: Level, baseRadius: number): PositionRadius {
     const positions: LayoutPosition[] = [];
 
-    let positionsToAllocate = level.total;
+    let positionsToAllocate = levelInfo.total;
     let radius = baseRadius;
 
     while (positionsToAllocate > 0) {
         const positionsOnCircle = calculateMaxNodesOnCircle(radius);
-        const circlePositions = generateRadialPositions(radius, positionsOnCircle);
+        let circlePositions: LayoutPosition[];
+        if (positionsOnCircle > positionsToAllocate && level === 1) {
+            circlePositions = generateRadialPositions(radius, positionsToAllocate);
+        } else {
+            circlePositions = generateRadialPositions(radius, positionsOnCircle);
+        }
 
         positions.push(...circlePositions);
         positionsToAllocate -= positionsOnCircle;
         radius += SAME_LEVEL_RADII_SPACING;
     }
 
-    return positions;
+    return { endRadius: radius - SAME_LEVEL_RADII_SPACING, positions };
 }
 
 function generateRadialPositions(radius: number, totalPositions: number): LayoutPosition[] {
