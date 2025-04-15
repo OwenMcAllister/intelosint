@@ -12,9 +12,9 @@ export default function InformationNode({ data }: NodeProps<InfoNode>) {
 
 	return (
 		<>
-			<Handle type="target" position={Position.Top} />
+			<Handle type="target" position={Position.Top} isConnectable={false} />
 			<div
-				className="p-3.5 border border-black rounded-md bg-blue-200 space-y-1.5 h-20 w-28 flex flex-col justify-center"
+				className="p-3.5 border border-gray-300 rounded-full bg-gray-100 h-24 w-24 flex flex-col justify-center items-center"
 				onMouseEnter={() => data.onMouseEnter?.()}
 				onMouseLeave={() => data.onMouseLeave?.()}
 			>
@@ -24,14 +24,14 @@ export default function InformationNode({ data }: NodeProps<InfoNode>) {
 				{!searched && (
 					<button
 						type="button"
-						className="mx-auto block px-2 py-1 bg-blue-500 text-white text-xs rounded-md hover:bg-blue-600"
+						className="mx-auto block px-2 py-1 bg-gray-600 text-white text-xs rounded-full hover:bg-gray-700"
 						onClick={handleRequest}
 					>
 						Search
 					</button>
 				)}
 			</div>
-			<Handle type="source" position={Position.Bottom} />
+			<Handle type="source" position={Position.Bottom} isConnectable={false} />
 		</>
 	);
 }

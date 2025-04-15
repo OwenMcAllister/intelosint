@@ -6,6 +6,7 @@ import {
 	Background,
 	useReactFlow,
 	ReactFlowProvider,
+	BackgroundVariant,
 } from "@xyflow/react";
 import { useEffect, useState, useCallback } from "react";
 import "@xyflow/react/dist/style.css";
@@ -56,6 +57,10 @@ function InternalGraph({ initialNodes, initialEdges }: GraphProps) {
 		[nodes],
 	);
 
+	const zoomOutAndCenter = useCallback(() => {
+		reactFlow.fitView({ padding: 0.2, duration: 800 });
+	}, [reactFlow]);
+
 	const handleSetFocus = (node: InfoNode) => {
 		reactFlow.setCenter(node.position.x + 50, node.position.y + 30, {
 			zoom: 1.5,
@@ -89,6 +94,7 @@ function InternalGraph({ initialNodes, initialEdges }: GraphProps) {
 				focusedNode,
 				parentNode,
 				focus: focusNode,
+				zoomOutAndCenter,
 			});
 		};
 
@@ -97,10 +103,10 @@ function InternalGraph({ initialNodes, initialEdges }: GraphProps) {
 		return () => {
 			window.removeEventListener("keydown", handleKeyDown);
 		};
-	}, [focusedNode, parentNode, focusNode]);
+	}, [focusedNode, parentNode, focusNode, zoomOutAndCenter]);
 
 	return (
-		<div style={{ width: "100%", height: "100vh" }}>
+		<div className="w-full h-screen bg-gradient-to-b from-slate-900 to-black">
 			<ReactFlow
 				nodes={nodes}
 				edges={edges}
@@ -109,7 +115,13 @@ function InternalGraph({ initialNodes, initialEdges }: GraphProps) {
 				fitView
 				defaultViewport={{ x: 0, y: 0, zoom: 1 }}
 			>
-				<Background />
+				<Background
+					color="#f8fafc"
+					variant={BackgroundVariant.Dots}
+					gap={36}
+					size={1.5}
+					className="opacity-30"
+				/>
 			</ReactFlow>
 		</div>
 	);
